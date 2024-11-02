@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "549502219",
+    "project_id": "disciplina-api-pos-2024",
+    "storage_bucket": "disciplina-api-pos-2024.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:549502219:android:39743fbf158fca40bd760e",
+        "android_client_info": {
+          "package_name": "com.example.myapitest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "549502219-dejdq7cjb88j2jf8d495huqjhlcqhqro.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapitest",
+            "certificate_hash": "f0acea52ee779d2b0b2912b58013a1a2d1e611e7"
+          }
+        },
+        {
+          "client_id": "549502219-o3nu64vhc16tjlumpn984cq29kldg8e5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdscYq6ogbXClv12AiK1MxpEP6GVHNXTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "549502219-o3nu64vhc16tjlumpn984cq29kldg8e5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

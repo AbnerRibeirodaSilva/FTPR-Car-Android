@@ -1,8 +1,12 @@
 package com.example.myapitest
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapitest.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,7 +40,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
-        // TODO
+        binding.logoutButton.setOnClickListener{
+            signOut()
+        }
     }
 
     private fun requestLocationPermission() {
@@ -44,6 +50,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchItems() {
-        // TODO
+        RetrofitInstance.api.getCars().enqueue(object : Callback<List<Car>> {
+            override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
+                if (response.isSuccessful) {
+                    val cars = response.body() ?: emptyList()
+                    // Atualize o RecyclerView com a lista de carros
+                    setupRecyclerView(cars)
+                }
+            }
+
+            override fun onFailure(call: Call<List<Car>>, t: Throwable) {
+
+            }
+        })
     }
+
+    companion object{
+        fun newIntent(context: Context) = Intent(context, MainActivity::class.java)
+    }
+
+
+    private fun signOut(){
+        FirebaseAuth.getInstance().signOut()
+        val intent = Intent(this, SignInActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
+
+
 }
