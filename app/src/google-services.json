@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "549502219",
-    "project_id": "disciplina-api-pos-2024",
-    "storage_bucket": "disciplina-api-pos-2024.firebasestorage.app"
+    "project_number": "696104208160",
+    "project_id": "disciplina-api",
+    "storage_bucket": "disciplina-api.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:549502219:android:39743fbf158fca40bd760e",
+        "mobilesdk_app_id": "1:696104208160:android:4190665718e345b6b9b945",
         "android_client_info": {
           "package_name": "com.example.myapitest"
         }
       },
       "oauth_client": [
         {
-          "client_id": "549502219-dejdq7cjb88j2jf8d495huqjhlcqhqro.apps.googleusercontent.com",
+          "client_id": "696104208160-nsm522ndl674tk3d5s6k45qlvm2luis0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.myapitest",
-            "certificate_hash": "f0acea52ee779d2b0b2912b58013a1a2d1e611e7"
+            "certificate_hash": "9b559edae42359bba7e6fe72cce3ca5a26b1953f"
           }
         },
         {
-          "client_id": "549502219-o3nu64vhc16tjlumpn984cq29kldg8e5.apps.googleusercontent.com",
+          "client_id": "696104208160-gd7ovqhppummu2m50os6fu77evgs9hjp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBdscYq6ogbXClv12AiK1MxpEP6GVHNXTk"
+          "current_key": "AIzaSyA-ie-LeV-10U1VvlyiyLkALykvE73CcZE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "549502219-o3nu64vhc16tjlumpn984cq29kldg8e5.apps.googleusercontent.com",
+              "client_id": "696104208160-gd7ovqhppummu2m50os6fu77evgs9hjp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

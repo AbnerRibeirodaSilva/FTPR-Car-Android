@@ -1,116 +1,144 @@
 package com.example.myapitest
 
+import ItemAdapter
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapitest.adapter.CarAdapter
 import com.example.myapitest.databinding.ActivityMainBinding
-import com.example.myapitest.model.Car
+import com.example.myapitest.models.Car
+import com.example.myapitest.service.Result
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var carAdapter: CarAdapter
+    private lateinit var googleSignInClient: GoogleSignInClient
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        requestLocationPermission()
+        setupGoogleAuthUser()
+
         setupView()
+
+
+        // 1- Criar tela de Login com algum provedor do Firebase (Telefone, Google)
+        //      Cadastrar o Seguinte celular para login de test: +5511912345678
+        //      Código de verificação: 101010
+
+        // 2- Criar Opção de Logout no aplicativo
+
+        // 3- Integrar API REST /car no aplicativo
+        //      API será disponibilida no Github
+        //      JSON Necessário para salvar e exibir no aplicativo
+        //      O Image Url deve ser uma foto armazenada no Firebase Storage
+        //      { "id": "001", "imageUrl":"https://image", "year":"2020/2020", "name":"Gaspar", "licence":"ABC-1234", "place": {"lat": 0, "long": 0} }
+
+        // Opcionalmente trabalhar com o Google Maps ara enviar o place
     }
 
-    override fun onResume() {
-        fetchItems()
-        super.onResume()
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
+
+    override fun onResume() {
+        super.onResume()
+        fetchItems()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_logout -> {
+                logoutGoogle()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupView() {
-        this.binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.logoutButton.setOnClickListener{
-            signOut()
-        }
-        this.carAdapter = CarAdapter(this) { idCarro ->
-            val intentDetalhesCarro = Intent(this, CarDetailsActivity::class.java)
-            intentDetalhesCarro.putExtra("id_carro", idCarro)
-            startActivity(intentDetalhesCarro)
-            finish()
-        }
 
-        this.binding.recyclerView.adapter = this.carAdapter
-
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = true
+            fetchItems()
+        }
+        binding.addCta.setOnClickListener {
+            startActivity(CreateCarActivity.newIntent(this))
+        }
     }
 
-    private fun signOut(){
-      //  FirebaseAuth.getInstance().signOut()
-        val intent = Intent(this, SignInActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+    private fun setupGoogleAuthUser() {
+        googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
+    }
+
+
+    private fun handleOnSuccess(data: List<Car>) {
+        val adapter = ItemAdapter(data) {
+            startActivity(
+                CarDetailActivity.newIntent(
+                    this,
+                    it.id
+                )
+            )
+        }
+        binding.recyclerView.adapter = adapter
+    }
+
+
+    private fun logoutGoogle() {
+        FirebaseAuth.getInstance().signOut()
+        val intent = LoginActivity.newIntent(this)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
 
     }
 
-    private fun requestLocationPermission() {
-
-    }
-
-    private fun notification(sucesso: Boolean, mensagem: String) {
-
-    }
 
     private fun fetchItems() {
 
-        try {
-            val carApi: CarApi = CarApi()
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall { RetrofitClient.apiService.fetchCars() }
 
 
-            val onProcessandoRequisicaoConsultarCarros: () -> Unit = {
+            withContext(Dispatchers.Main) {
+                binding.swipeRefreshLayout.isRefreshing = false
+                when (result) {
+                    is Result.Error -> {
+                        Log.e("MainActivity", "Error: ${result.message}")
+                        Toast.makeText(this@MainActivity, "Erro", Toast.LENGTH_SHORT).show()
+                    }
 
+                    is Result.Success -> handleOnSuccess(result.data)
+                }
             }
-
-
-            val onError: (String) -> Unit = { mensagemErro ->
-                this.notification(false, mensagemErro)
-            }
-
-
-            val onSuccess: (ArrayList<Car>) -> Unit = { carros ->
-                val msgAlertaSucesso: String = if (carros.size == 0) "Existe um total de ${ carros.size } cadastrados no sistema."
-                else "Não existem carros cadastrados no sistema."
-
-                this.notification(true, msgAlertaSucesso)
-
-
-                this.apresentarCarros(carros)
-            }
-
-            carApi.listCars(
-                processingRequest = onProcessandoRequisicaoConsultarCarros,
-                onError = onError,
-                onSuccess = onSuccess
-
-            )
-
-        } catch (e: Exception) {
-            Toast.makeText(this, "Erro: ${ e.message }", Toast.LENGTH_LONG)
-                .show()
         }
-
     }
 
-    private fun apresentarCarros(carros: ArrayList<Car>) {
-        Log.d("MainActivity", "Carros recebidos: ${carros.size}")
-        this.carAdapter.cars = carros
-        this.carAdapter.notifyDataSetChanged()
-    }
 
-    companion object{
+    companion object {
         fun newIntent(context: Context) = Intent(context, MainActivity::class.java)
     }
-
 }
